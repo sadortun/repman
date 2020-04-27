@@ -93,7 +93,7 @@ class User implements UserInterface
     public function __construct(UuidInterface $id, string $email, string $emailConfirmToken, array $roles)
     {
         $this->id = $id;
-        $this->email = $email;
+        $this->email = \mb_strtolower($email);
         $this->emailConfirmToken = $emailConfirmToken;
         $this->roles = array_values(array_unique($roles));
         $this->createdAt = new \DateTimeImmutable();
@@ -292,6 +292,15 @@ class User implements UserInterface
         }
 
         return null;
+    }
+
+    public function removeOAuthToken(string $type): void
+    {
+        foreach ($this->oauthTokens as $oauthToken) {
+            if ($oauthToken->isType($type)) {
+                $this->oauthTokens->removeElement($oauthToken);
+            }
+        }
     }
 
     /**
